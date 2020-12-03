@@ -1,0 +1,251 @@
+import React, { useState, useRef } from "react";
+import _ from "lodash/fp";
+import { useForm } from "react-hook-form";
+import Select from "react-select";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
+import "./style.scss";
+
+function FormLogin() {
+  // required: true, validation enter data required
+  // maxLength: 20,  validation max size
+  // minLength: 3,  validation min size
+  // pattern: /^[A-Za-z]+$/i, don't use space, number, accented letters, special characters
+  // pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, fort mat email
+
+  const { register, handleSubmit, errors, watch, reset } = useForm({});
+  const [isPasswordShown, setIsPasswordShown] = useState(false);
+  const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false);
+
+  const password = useRef({});
+  password.current = watch("password", "");
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordShown(!isPasswordShown);
+  };
+  console.log("isPasswordShown", isPasswordShown);
+
+  const toggleConfirmPasswordVisibility = () => {
+    setIsConfirmPasswordShown(!isConfirmPasswordShown);
+  };
+  console.log("isPasswordShown", isPasswordShown);
+
+  const onSubmit = async (data) => {
+    alert(JSON.stringify(data));
+  };
+
+  const options = [
+    { value: "chocolate", label: "Chocolate" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "vanilla", label: "Vanilla" },
+  ];
+
+  // const [value, setValue] = useState();
+
+  return (
+    <>
+      <div className="wrapper">
+        <div className="container">
+          <div className="show-infor">
+            <div className="address-icon">
+              <h1>
+                <i className="fa fa-map-marker" aria-hidden="true"></i> ADDRESS
+              </h1>
+              <h1>321, Street Name, Country</h1>
+            </div>
+            <div className="email-icon">
+              <h1>
+                <i className="fa fa-envelope" aria-hidden="true"></i> EMAIL
+              </h1>
+              <h1>yourmail@domain.com</h1>
+            </div>
+          </div>
+
+          <div className="required-infor">
+            <div className="register-user">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <label>First Name</label>
+                <input
+                  name="firstName"
+                  type="text"
+                  placeholder="Rain"
+                  ref={register({
+                    required: true,
+                    maxLength: 20,
+                    pattern: /^[A-Za-z]+$/,
+                  })}
+                />
+                {_.get("firstName.type", errors) === "required" && (
+                  <p className="p-tag-of-input">This field is required</p>
+                )}
+                {_.get("firstName.type", errors) === "maxLength" && (
+                  <p>First name cannot exceed 20 characters</p>
+                )}
+                {_.get("firstName.type", errors) === "pattern" && (
+                  <p>Alphabetical characters only</p>
+                )}
+
+                <label>Last Name</label>
+                <input
+                  name="lastName"
+                  placeholder="Be"
+                  type="text"
+                  ref={register({
+                    required: true,
+                    maxLength: 20,
+                    pattern: /^[A-Za-z]+$/i,
+                  })}
+                />
+                {_.get("lastName.type", errors) === "required" && (
+                  <p className="p-tag-of-input">This field is required</p>
+                )}
+
+                {_.get("lastName.type", errors) === "maxLength" && (
+                  <p>First name cannot exceed 20 characters</p>
+                )}
+                {_.get("lastName.type", errors) === "pattern" && (
+                  <p>Alphabetical characters only</p>
+                )}
+
+                <label>Phone Number</label>
+                <input
+                  name="phone"
+                  type="number"
+                  placeholder="036 807 8123"
+                  ref={register({
+                    required: true,
+                    maxLength: 10,
+                    minLength: 10,
+                  })}
+                />
+                {_.get("phone.type", errors) === "required" && (
+                  <p className="p-tag-of-input">This field is required</p>
+                )}
+                {_.get("phone.type", errors) === "maxLength" && (
+                  <p>Phone number cannot exceed 10 characters</p>
+                )}
+                {_.get("phone.type", errors) === "minLength" && (
+                  <p>Phone number cannot exceed 10 characters</p>
+                )}
+
+                <label>Email</label>
+                <input
+                  name="email"
+                  type="text"
+                  placeholder="truongtrungtruc@gmail.com"
+                  ref={register({
+                    required: true,
+                    pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  })}
+                />
+                {_.get("email.type", errors) === "required" && (
+                  <p>This field is required</p>
+                )}
+                {_.get("email.type", errors) === "pattern" && (
+                  <p>invalid email address</p>
+                )}
+                <label>Password</label>
+                <input
+                  name="password"
+                  type={isPasswordShown ? "text" : "password"}
+                  placeholder="*******"
+                  ref={register({
+                    required: "You must specify a password",
+                    minLength: {
+                      value: 8,
+                      message: "Password must have at least 8 characters",
+                    },
+                  })}
+                />
+                <i
+                  className={`fa ${
+                    isPasswordShown ? "fa-eye-slash" : "fa-eye"
+                  } password-icon`}
+                  onClick={togglePasswordVisibility}
+                />
+                {errors.password && <p>{errors.password.message}</p>}
+
+                <label>Confirm password</label>
+                <input
+                  name="password_repeat"
+                  // type="password"
+                  type={isConfirmPasswordShown ? "text" : "password"}
+                  placeholder="*******"
+                  ref={register({
+                    validate: (value) =>
+                      value === password.current ||
+                      "The passwords do not match",
+                  })}
+                />
+                <i
+                  className={`fa ${
+                    isConfirmPasswordShown ? "fa-eye-slash" : "fa-eye"
+                  } password-icon`}
+                  onClick={toggleConfirmPasswordVisibility}
+                />
+                {errors.password_repeat && (
+                  <p>{errors.password_repeat.message}</p>
+                )}
+
+                <label>Comment</label>
+                <textarea
+                  name="age"
+                  type="number"
+                  placeholder="I am learning react hooks form"
+                  ref={register({
+                    required: true,
+                    maxLength: 20,
+                    minLength: 3,
+                  })}
+                />
+                {_.get("age.type", errors) === "required" && (
+                  <p className="p-tag-of-textarea">This field is required</p>
+                )}
+                {_.get("age.type", errors) === "minLength" && (
+                  <p className="p-tag-of-textarea">
+                    First name cannot exceed 3 characters
+                  </p>
+                )}
+                {_.get("age.type", errors) === "maxLength" && (
+                  <p className="p-tag-of-textarea">
+                    First name cannot exceed 20 characters
+                  </p>
+                )}
+
+                <label className="reactSelectLabel">React select</label>
+                <Select
+                  className="reactSelect"
+                  name="filters"
+                  placeholder="Filters"
+                  // value={values.selectedOption}
+                  options={options}
+                  // onChange={handleMultiChange}
+                  // isMulti
+                />
+
+                <button
+                  type="submit"
+                  defaultValue="Submit"
+                  className="btn-submit"
+                >
+                  SEND
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-reset"
+                  onClick={() => reset()}
+                >
+                  RESET
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default FormLogin;
